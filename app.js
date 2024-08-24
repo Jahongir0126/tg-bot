@@ -147,9 +147,32 @@ async function handleProcess(chatId, selectedConfig) {
     let progress = 0;
     const keyCount = 4  ;
 
-    const updateProgress = (increment) => {
-      progress += increment;
-      // bot.sendMessage(chatId, `Progress: ${Math.round(progress)}%`);
+    // const updateProgress = (increment) => {
+    //   progress += increment;
+    //   bot.sendMessage(chatId, `Progress: ${Math.round(progress)}%`);
+    // };
+
+
+    let progressMessageId = null;
+
+    const updateProgress = async (increment) => {
+      const newProgress = progress + increment;
+
+      // Обновляем только если прогресс изменился
+      if (Math.round(newProgress) !== Math.round(progress)) {
+        progress = newProgress;
+        const progressText = `Progress: ${Math.round(progress)}%`;
+
+        if (progressMessageId) {
+          await bot.editMessageText(progressText, {
+            chat_id: chatId,
+            message_id: progressMessageId,
+          });
+        } else {
+          const sentMessage = await bot.sendMessage(chatId, progressText);
+          progressMessageId = sentMessage.message_id;
+        }
+      }
     };
    
     
